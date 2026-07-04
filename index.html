@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오늘도 적당히</title>
+  <style>
+    :root {
+      --bg: #f6f4ee;
+      --paper: #fffdf8;
+      --ink: #252525;
+      --soft-ink: #68635c;
+      --line: #ded7cb;
+      --green: #2f8f5b;
+      --mint: #d7efe2;
+      --yellow: #f2c14e;
+      --coral: #e9785f;
+      --blue: #5a8fd8;
+      --violet: #7a6fc4;
+      --shadow: 0 14px 40px rgba(72, 62, 44, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.2)),
+        var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 2px 18px;
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 48px);
+      line-height: 1.05;
+    }
+
+    .title-wrap p {
+      margin: 8px 0 0;
+      color: var(--soft-ink);
+      font-size: 16px;
+    }
+
+    .date-pill {
+      flex: 0 0 auto;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      color: var(--soft-ink);
+      font-weight: 700;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.92fr) minmax(320px, 1.08fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .room-panel {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .room {
+      position: relative;
+      min-height: 370px;
+      background:
+        linear-gradient(180deg, #f8e8d6 0 55%, #dcc5aa 55% 56%, #c7a77f 56% 100%);
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .window {
+      position: absolute;
+      top: 34px;
+      left: 28px;
+      width: 112px;
+      height: 92px;
+      border: 7px solid #7b6148;
+      border-radius: 6px;
+      background: linear-gradient(#8dc4ef, #d7f0ff);
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,0.42);
+    }
+
+    .window::before,
+    .window::after {
+      content: "";
+      position: absolute;
+      background: #7b6148;
+    }
+
+    .window::before {
+      left: 48%;
+      top: 0;
+      width: 6px;
+      height: 100%;
+    }
+
+    .window::after {
+      left: 0;
+      top: 47%;
+      width: 100%;
+      height: 6px;
+    }
+
+    .rug {
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      width: 72%;
+      height: 86px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(ellipse, #f7d982 0 55%, #e9a96a 56% 100%);
+      opacity: 0.94;
+    }
+
+    .shelf {
+      position: absolute;
+      right: 24px;
+      top: 82px;
+      width: 120px;
+      height: 14px;
+      border-radius: 999px;
+      background: #88694a;
+    }
+
+    .item {
+      position: absolute;
+      transform: scale(0);
+      transform-origin: bottom center;
+      transition: transform 220ms ease;
+    }
+
+    .item.show {
+      transform: scale(1);
+    }
+
+    .plant {
+      right: 54px;
+      top: 28px;
+      width: 42px;
+      height: 70px;
+    }
+
+    .plant::before {
+      content: "";
+      position: absolute;
+      left: 11px;
+      bottom: 0;
+      width: 21px;
+      height: 24px;
+      border-radius: 0 0 8px 8px;
+      background: var(--coral);
+    }
+
+    .plant::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 2px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50% 0 50% 50%;
+      background: var(--green);
+      box-shadow: 17px 9px 0 #58aa70, -9px 14px 0 #4c9d62;
+    }
+
+    .lamp {
+      left: 38px;
+      bottom: 62px;
+      width: 56px;
+      height: 120px;
+    }
+
+    .lamp::before {
+      content: "";
+      position: absolute;
+      left: 25px;
+      top: 30px;
+      width: 7px;
+      height: 72px;
+      background: #5c5145;
+    }
+
+    .lamp::after {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 0;
+      width: 42px;
+      height: 36px;
+      border-radius: 18px 18px 6px 6px;
+      background: var(--yellow);
+      box-shadow: 0 0 28px rgba(242,193,78,0.62);
+    }
+
+    .book {
+      right: 32px;
+      top: 58px;
+      width: 62px;
+      height: 22px;
+      border-radius: 3px;
+      background: var(--blue);
+      box-shadow: 0 12px 0 var(--violet), 0 24px 0 #f3f0df;
+    }
+
+    .badge-object {
+      left: 152px;
+      top: 54px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--yellow);
+      border: 5px solid #fff2bd;
+      box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+    }
+
+    .badge-object::after {
+      content: "방어";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      color: #6d471a;
+    }
+
+    .character {
+      position: absolute;
+      left: 50%;
+      bottom: 68px;
+      width: 156px;
+      height: 196px;
+      transform: translateX(-50%);
+      transition: transform 220ms ease;
+    }
+
+    .ear {
+      position: absolute;
+      top: 0;
+      width: 38px;
+      height: 86px;
+      border: 4px solid #493f35;
+      border-radius: 50% 50% 44% 44%;
+      background: #e9ecef;
+      z-index: 1;
+    }
+
+    .ear::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 14px;
+      width: 16px;
+      height: 52px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #f2c7cf;
+    }
+
+    .ear.left {
+      left: 39px;
+      transform: rotate(-10deg);
+    }
+
+    .ear.right {
+      right: 39px;
+      transform: rotate(10deg);
+    }
+
+    .body {
+      position: absolute;
+      left: 32px;
+      bottom: 0;
+      width: 92px;
+      height: 108px;
+      border-radius: 48px 48px 34px 34px;
+      background: #e9ecef;
+      border: 4px solid #493f35;
+      z-index: 2;
+    }
+
+    .belly {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      width: 54px;
+      height: 58px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: #f8f9fa;
+      border: 3px solid rgba(73,63,53,0.28);
+    }
+
+    .arm {
+      position: absolute;
+      top: 104px;
+      width: 34px;
+      height: 58px;
+      border: 4px solid #493f35;
+      border-radius: 999px;
+      background: #e9ecef;
+      z-index: 1;
+    }
+
+    .arm.left {
+      left: 16px;
+      transform: rotate(18deg);
+    }
+
+    .arm.right {
+      right: 16px;
+      transform: rotate(-18deg);
+    }
+
+    .foot {
+      position: absolute;
+      bottom: -8px;
+      width: 50px;
+      height: 28px;
+      border: 4px solid #493f35;
+      border-radius: 999px;
+      background: #dde2e6;
+      z-index: 3;
+    }
+
+    .foot.left {
+      left: 26px;
+      transform: rotate(-8deg);
+    }
+
+    .foot.right {
+      right: 26px;
+      transform: rotate(8deg);
+    }
+
+    .head {
+      position: absolute;
+      left: 18px;
+      top: 54px;
+      width: 120px;
+      height: 106px;
+      border-radius: 50% 50% 46% 46%;
+      background: #eef0f2;
+      border: 4px solid #493f35;
+      z-index: 4;
+      box-shadow: inset 0 -8px 0 rgba(255,255,255,0.28);
+    }
+
+    .cheek {
+      position: absolute;
+      top: 62px;
+      width: 17px;
+      height: 10px;
+      border-radius: 50%;
+      background: #f4b8c1;
+      opacity: 0.72;
+    }
+
+    .cheek.left {
+      left: 22px;
+    }
+
+    .cheek.right {
+      right: 22px;
+    }
+
+    .nose {
+      position: absolute;
+      left: 50%;
+      top: 56px;
+      width: 12px;
+      height: 9px;
+      transform: translateX(-50%);
+      border-radius: 50% 50% 60% 60%;
+      background: #d9828e;
+    }
+
+    .eye {
+      position: absolute;
+      top: 42px;
+      width: 10px;
+      height: 13px;
+      border-radius: 50%;
+      background: #302b25;
+    }
+
+    .eye.left {
+      left: 36px;
+    }
+
+    .eye.right {
+      right: 36px;
+    }
+
+    .mouth {
+      position: absolute;
+      left: 50%;
+      top: 66px;
+      width: 28px;
+      height: 13px;
+      transform: translateX(-50%);
+      border-bottom: 3px solid #302b25;
+      border-radius: 0 0 24px 24px;
+    }
+
+    .character[data-mood="tired"] {
+      transform: translateX(-50%) translateY(8px);
+    }
+
+    .character[data-mood="tired"] .mouth {
+      top: 72px;
+      border-bottom: 0;
+      border-top: 3px solid #302b25;
+      border-radius: 24px 24px 0 0;
+    }
+
+    .character[data-mood="calm"] .mouth {
+      width: 30px;
+      height: 8px;
+      border-radius: 999px;
+      border-bottom: 4px solid #302b25;
+    }
+
+    .character[data-mood="proud"] {
+      transform: translateX(-50%) translateY(-8px) rotate(-2deg);
+    }
+
+    .character[data-mood="proud"] .mouth {
+      height: 18px;
+      border-bottom-width: 4px;
+    }
+
+    .speech {
+      position: absolute;
+      right: 18px;
+      bottom: 196px;
+      width: min(46%, 220px);
+      padding: 13px 14px;
+      border-radius: 8px;
+      background: rgba(255,253,248,0.95);
+      border: 1px solid var(--line);
+      font-weight: 800;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    .room-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .score-box {
+      border-radius: 8px;
+      background: #f5efe3;
+      padding: 14px;
+    }
+
+    .score-number {
+      margin-top: 4px;
+      font-size: 34px;
+      font-weight: 900;
+    }
+
+    .badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f9e5a7;
+      color: #624714;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .choice-btn,
+    .log-btn,
+    .main-btn,
+    .small-btn,
+    .next-btn {
+      min-height: 52px;
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: #ece5d8;
+      color: var(--ink);
+      font-weight: 850;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
+    }
+
+    .choice-btn.active {
+      background: var(--mint);
+      outline: 3px solid rgba(47,143,91,0.28);
+    }
+
+    .log-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      background: #eef2fb;
+    }
+
+    .log-btn strong {
+      font-size: 17px;
+    }
+
+    .log-btn span {
+      color: var(--soft-ink);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .main-btn {
+      width: 100%;
+      background: var(--green);
+      color: white;
+      font-size: 17px;
+    }
+
+    .danger-btn {
+      background: var(--coral);
+      color: white;
+    }
+
+    .next-btn {
+      width: 100%;
+      background: #3b3b3b;
+      color: white;
+    }
+
+    .small-btn {
+      min-height: 42px;
+      padding: 9px 12px;
+      background: #f1eadf;
+      font-size: 14px;
+    }
+
+    .recommendation {
+      display: grid;
+      gap: 10px;
+    }
+
+    .step {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 11px;
+      border-radius: 8px;
+      background: #f8f1e6;
+      line-height: 1.45;
+    }
+
+    .step-num {
+      display: grid;
+      place-items: center;
+      flex: 0 0 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--green);
+      color: white;
+      font-weight: 900;
+    }
+
+    .mission {
+      display: grid;
+      gap: 12px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #fff7d9;
+      border: 1px solid #ecd78d;
+    }
+
+    .mission-text {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .toggle-row,
+    .weight-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 62px;
+      height: 34px;
+      border-radius: 999px;
+      background: #cfc6b9;
+      flex: 0 0 auto;
+    }
+
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: white;
+      transition: left 180ms ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+
+    .toggle.on {
+      background: var(--green);
+    }
+
+    .toggle.on::after {
+      left: 32px;
+    }
+
+    .weight-row {
+      margin-top: 12px;
+      display: none;
+    }
+
+    .weight-row.show {
+      display: flex;
+    }
+
+    .weight-row input {
+      width: 120px;
+      min-height: 44px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      font-weight: 800;
+    }
+
+    .rescue-box {
+      display: none;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .rescue-box.show {
+      display: grid;
+    }
+
+    .rescue-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .week {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .day-card {
+      min-height: 116px;
+      border-radius: 8px;
+      padding: 9px;
+      background: #f4ede2;
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .day-name {
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .day-score {
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .restart {
+      min-height: 25px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .empty {
+      color: #9a9187;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      z-index: 5;
+      width: min(420px, calc(100% - 28px));
+      transform: translate(-50%, 120px);
+      transition: transform 200ms ease;
+      padding: 14px 16px;
+      border-radius: 8px;
+      background: #252525;
+      color: white;
+      font-weight: 850;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.24);
+    }
+
+    .toast.show {
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 860px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .date-pill {
+        align-self: stretch;
+        text-align: center;
+      }
+
+      .room {
+        min-height: 340px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app {
+        padding: 12px;
+      }
+
+      .panel {
+        padding: 14px;
+      }
+
+      .button-grid,
+      .rescue-actions,
+      .room-info {
+        grid-template-columns: 1fr;
+      }
+
+      .week {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .speech {
+        right: 12px;
+        bottom: 188px;
+        width: 52%;
+        font-size: 14px;
+      }
+
+      .window {
+        left: 16px;
+        width: 92px;
+        height: 78px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="title-wrap">
+        <h1 id="appNameHeading">오늘도 적당히</h1>
+        <p>완벽한 하루보다, 다음 선택 하나를 가볍게 바꿔요.</p>
+      </div>
+      <div class="date-pill" id="todayLabel"></div>
+    </header>
+
+    <section class="layout">
+      <div class="panel room-panel">
+        <div class="room" aria-label="캐릭터의 방">
+          <div class="window"></div>
+          <div class="shelf"></div>
+          <div class="rug"></div>
+          <div class="item plant" id="itemPlant" title="미션 완료 식물"></div>
+          <div class="item lamp" id="itemLamp" title="꾸준함 조명"></div>
+          <div class="item book" id="itemBook" title="기록 책"></div>
+          <div class="item badge-object" id="itemBadge" title="야식 방어 배지"></div>
+
+          <div class="character" id="character" data-mood="calm" aria-hidden="true">
+            <div class="ear left"></div>
+            <div class="ear right"></div>
+            <div class="arm left"></div>
+            <div class="arm right"></div>
+            <div class="body">
+              <div class="belly"></div>
+            </div>
+            <div class="foot left"></div>
+            <div class="foot right"></div>
+            <div class="head">
+              <div class="eye left"></div>
+              <div class="eye right"></div>
+              <div class="cheek left"></div>
+              <div class="cheek right"></div>
+              <div class="nose"></div>
+              <div class="mouth"></div>
+            </div>
+          </div>
+          <div class="speech" id="characterMessage">오늘은 작게 시작해도 충분해요.</div>
+        </div>
+
+        <div class="room-info">
+          <div class="score-box">
+            <strong>하루 점수</strong>
+            <div class="score-number"><span id="score">0</span>점</div>
+          </div>
+          <div class="score-box">
+            <strong>오늘의 칭찬</strong>
+            <p id="praise" style="margin:8px 0 0; line-height:1.45;">기록을 시작하면 방이 조금씩 살아나요.</p>
+            <div class="badge-list" id="badgeList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>오늘의 컨디션</h2>
+          <div class="button-grid" id="conditionButtons"></div>
+        </section>
+
+        <section class="panel">
+          <h2>지금 바로 할 일</h2>
+          <div class="recommendation" id="recommendation"></div>
+        </section>
+
+        <section class="panel">
+          <h2>간편 기록</h2>
+          <div class="button-grid">
+            <button class="log-btn" data-log="meal"><strong>식사 기록</strong><span id="mealCount">0번</span></button>
+            <button class="log-btn" data-log="water"><strong>물 기록</strong><span id="waterCount">0잔</span></button>
+            <button class="log-btn" data-log="exercise"><strong>운동 기록</strong><span id="exerciseCount">0번</span></button>
+            <button class="next-btn" id="nextChoiceBtn">다음 선택</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>오늘의 작은 미션</h2>
+          <div class="mission">
+            <p class="mission-text" id="missionText"></p>
+            <button class="main-btn" id="completeMissionBtn">미션 완료</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>야식 구조</h2>
+          <button class="main-btn danger-btn" id="rescueBtn">야식 충동이 왔어요</button>
+          <div class="rescue-box" id="rescueBox">
+            <div class="recommendation" id="rescueSteps"></div>
+            <div class="rescue-actions">
+              <button class="main-btn" id="rescueSuccessBtn">야식 방어 성공</button>
+              <button class="next-btn" id="rescueRestartBtn">실패해도 다음 선택</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>체중 기록 선택</h2>
+          <div class="toggle-row">
+            <strong>체중 입력 사용</strong>
+            <button class="toggle" id="weightToggle" aria-label="체중 입력 켜고 끄기"></button>
+          </div>
+          <div class="weight-row" id="weightRow">
+            <label for="weightInput"><strong>오늘 체중</strong></label>
+            <input id="weightInput" type="number" min="0" step="0.1" placeholder="kg">
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>7일 기록표</h2>
+          <div class="week" id="weekTable"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /*
+      초보자가 수정해도 되는 부분 1: 앱 이름
+      아래 APP_NAME의 글자를 바꾸면 브라우저 제목과 화면 제목이 바뀝니다.
+    */
+    const APP_NAME = "오늘도 할 수 있어!";
+
+    /*
+      초보자가 수정해도 되는 부분 2: 미션 문구
+      따옴표 안의 문장을 원하는 미션으로 바꿔도 됩니다.
+    */
+    const MISSIONS = [
+      "식후 10분만 천천히 걷기",
+      "달달한 음료 대신 물 한 잔 마시기",
+      "배부름이 오면 세 숟가락 남겨보기",
+      "오늘 한 끼에 채소 한 가지 더하기",
+      "간식 먹기 전 물 한 잔 마시기",
+      "자기 전 5분 스트레칭하기",
+      "허기와 입 심심함을 한 번 구분해보기"
+    ];
+
+    /*
+      초보자가 수정해도 되는 부분 3: 상황별 추천 행동
+      condition은 버튼 이름, steps는 추천 순서입니다.
+    */
+    const CONDITIONS = [
+      {
+        id: "hunger",
+        label: "배고픔",
+        steps: ["물 한 잔 마시기", "10분 기다리며 몸 상태 보기", "그래도 배고프면 단백질이나 과일처럼 가벼운 간식 선택"]
+      },
+      {
+        id: "stress",
+        label: "스트레스",
+        steps: ["깊게 숨 5번 쉬기", "자리에서 2분만 일어나기", "먹고 싶다면 작은 그릇에 덜어서 앉아서 먹기"]
+      },
+      {
+        id: "night",
+        label: "야식 충동",
+        steps: ["양치하거나 따뜻한 차 준비", "휴대폰을 잠깐 내려놓고 10분 버티기", "정말 필요하면 부담 적은 간식으로 끝내기"]
+      },
+      {
+        id: "dinner",
+        label: "회식 예정",
+        steps: ["첫 잔 전에 물 한 잔 마시기", "처음 접시에 먹을 양을 정해두기", "마지막에는 배부름보다 편안함 기준으로 멈추기"]
+      }
+    ];
+
+    /*
+      초보자가 수정해도 되는 부분 4: 야식 구조 단계
+      야식 구조 버튼을 눌렀을 때 나오는 안내입니다.
+    */
+    const NIGHT_RESCUE_STEPS = [
+      "지금 시간을 확인하고, 충동 이름을 붙여요. 예: 피곤해서 먹고 싶다.",
+      "물이나 따뜻한 차를 마시고 10분 타이머를 떠올려요.",
+      "먹는다면 봉지째 말고 작은 그릇 하나만 준비해요.",
+      "넘겼다면 바로 성공 처리. 못 넘겨도 다음 선택 버튼으로 기록을 이어가요."
+    ];
+
+    /*
+      초보자가 수정해도 되는 부분 5: 캐릭터 반응 메시지
+      상황에 맞는 말을 바꾸고 싶다면 아래 문장을 수정하세요.
+    */
+    const CHARACTER_MESSAGES = {
+      start: "오늘은 작게 시작해도 충분해요.",
+      log: "좋아요. 기록 하나가 방을 깨워요.",
+      mission: "미션 완료! 식물이 쑥 자란 기분이에요.",
+      rescue: "야식 방어 성공. 오늘의 나 꽤 멋져요.",
+      restart: "괜찮아요. 끊긴 게 아니라 다음 선택으로 이어졌어요.",
+      proud: "완벽하지 않아도 흐름은 계속 살아 있어요."
+    };
+
+    const STORAGE_KEY = "moderateTodayHabitApp";
+    const todayKey = getDateKey(new Date());
+    const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+
+    const defaultDay = {
+      conditions: [],
+      logs: { meal: 0, water: 0, exercise: 0 },
+      missionCompleted: false,
+      rescueSuccess: false,
+      restartCount: 0,
+      weightEnabled: false,
+      weight: "",
+      lastMessage: CHARACTER_MESSAGES.start
+    };
+
+    let state = loadState();
+    ensureToday();
+
+    const appNameHeading = document.getElementById("appNameHeading");
+    const todayLabel = document.getElementById("todayLabel");
+    const conditionButtons = document.getElementById("conditionButtons");
+    const recommendation = document.getElementById("recommendation");
+    const missionText = document.getElementById("missionText");
+    const character = document.getElementById("character");
+    const characterMessage = document.getElementById("characterMessage");
+    const score = document.getElementById("score");
+    const praise = document.getElementById("praise");
+    const badgeList = document.getElementById("badgeList");
+    const rescueBox = document.getElementById("rescueBox");
+    const rescueSteps = document.getElementById("rescueSteps");
+    const weekTable = document.getElementById("weekTable");
+    const toast = document.getElementById("toast");
+    const weightToggle = document.getElementById("weightToggle");
+    const weightRow = document.getElementById("weightRow");
+    const weightInput = document.getElementById("weightInput");
+
+    document.title = APP_NAME;
+    appNameHeading.textContent = APP_NAME;
+    todayLabel.textContent = formatKoreanDate(new Date());
+    missionText.textContent = getTodayMission();
+
+    conditionButtons.addEventListener("click", function (event) {
+      const button = event.target.closest("button[data-condition]");
+      if (!button) return;
+
+      const day = getToday();
+      const conditionId = button.dataset.condition;
+      if (day.conditions.includes(conditionId)) {
+        day.conditions = day.conditions.filter(function (id) {
+          return id !== conditionId;
+        });
+      } else {
+        day.conditions.push(conditionId);
+      }
+      day.lastMessage = CHARACTER_MESSAGES.proud;
+      saveAndRender();
+    });
+
+    document.querySelectorAll("[data-log]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        const type = button.dataset.log;
+        const day = getToday();
+        day.logs[type] += 1;
+        day.lastMessage = CHARACTER_MESSAGES.log;
+        saveAndRender();
+        showToast("기록했어요. 작은 선택 하나 추가!");
+      });
+    });
+
+    document.getElementById("completeMissionBtn").addEventListener("click", function () {
+      const day = getToday();
+      day.missionCompleted = true;
+      day.lastMessage = CHARACTER_MESSAGES.mission;
+      saveAndRender();
+      showToast("미션 완료! 방에 식물이 생겼어요.");
+    });
+
+    document.getElementById("rescueBtn").addEventListener("click", function () {
+      rescueBox.classList.toggle("show");
+    });
+
+    document.getElementById("rescueSuccessBtn").addEventListener("click", function () {
+      const day = getToday();
+      day.rescueSuccess = true;
+      day.lastMessage = CHARACTER_MESSAGES.rescue;
+      saveAndRender();
+      showToast("야식 방어 성공 배지를 얻었어요.");
+    });
+
+    document.getElementById("rescueRestartBtn").addEventListener("click", function () {
+      recordRestart();
+    });
+
+    document.getElementById("nextChoiceBtn").addEventListener("click", function () {
+      recordRestart();
+    });
+
+    weightToggle.addEventListener("click", function () {
+      const day = getToday();
+      day.weightEnabled = !day.weightEnabled;
+      saveAndRender();
+    });
+
+    weightInput.addEventListener("input", function () {
+      const day = getToday();
+      day.weight = weightInput.value;
+      saveState();
+    });
+
+    render();
+
+    function recordRestart() {
+      const day = getToday();
+      day.restartCount += 1;
+      day.lastMessage = CHARACTER_MESSAGES.restart;
+      saveAndRender();
+      showToast("좋아요. 실패가 아니라 다시 시작한 횟수로 남겼어요.");
+    }
+
+    function render() {
+      renderConditions();
+      renderRecommendation();
+      renderRescueSteps();
+      renderCounts();
+      renderWeight();
+      renderScore();
+      renderRoom();
+      renderWeek();
+    }
+
+    function renderConditions() {
+      const day = getToday();
+      conditionButtons.innerHTML = "";
+      CONDITIONS.forEach(function (condition) {
+        const button = document.createElement("button");
+        button.className = "choice-btn" + (day.conditions.includes(condition.id) ? " active" : "");
+        button.dataset.condition = condition.id;
+        button.textContent = condition.label;
+        conditionButtons.appendChild(button);
+      });
+    }
+
+    function renderRecommendation() {
+      const day = getToday();
+      const selected = day.conditions.length
+        ? CONDITIONS.find(function (condition) { return condition.id === day.conditions[day.conditions.length - 1]; })
+        : CONDITIONS[0];
+
+      recommendation.innerHTML = "";
+      selected.steps.forEach(function (text, index) {
+        recommendation.appendChild(createStep(text, index + 1));
+      });
+    }
+
+    function renderRescueSteps() {
+      rescueSteps.innerHTML = "";
+      NIGHT_RESCUE_STEPS.forEach(function (text, index) {
+        rescueSteps.appendChild(createStep(text, index + 1));
+      });
+    }
+
+    function createStep(text, number) {
+      const step = document.createElement("div");
+      step.className = "step";
+
+      const num = document.createElement("div");
+      num.className = "step-num";
+      num.textContent = number;
+
+      const copy = document.createElement("div");
+      copy.textContent = text;
+
+      step.appendChild(num);
+      step.appendChild(copy);
+      return step;
+    }
+
+    function renderCounts() {
+      const logs = getToday().logs;
+      document.getElementById("mealCount").textContent = logs.meal + "번";
+      document.getElementById("waterCount").textContent = logs.water + "잔";
+      document.getElementById("exerciseCount").textContent = logs.exercise + "번";
+    }
+
+    function renderWeight() {
+      const day = getToday();
+      weightToggle.classList.toggle("on", day.weightEnabled);
+      weightRow.classList.toggle("show", day.weightEnabled);
+      weightInput.value = day.weight || "";
+    }
+
+    function renderScore() {
+      const day = getToday();
+      const points = calculateScore(day);
+      score.textContent = points;
+      praise.textContent = getPraise(points, day);
+
+      badgeList.innerHTML = "";
+      if (day.missionCompleted) addBadge("미션 완료");
+      if (day.rescueSuccess) addBadge("야식 방어 성공");
+      if (day.restartCount > 0) addBadge("다시 시작 " + day.restartCount + "번");
+    }
+
+    function renderRoom() {
+      const day = getToday();
+      const points = calculateScore(day);
+      character.dataset.mood = points >= 70 ? "proud" : points >= 35 ? "calm" : "tired";
+      characterMessage.textContent = day.lastMessage || CHARACTER_MESSAGES.start;
+
+      document.getElementById("itemPlant").classList.toggle("show", day.missionCompleted);
+      document.getElementById("itemLamp").classList.toggle("show", points >= 55);
+      document.getElementById("itemBook").classList.toggle("show", totalLogs(day) >= 3);
+      document.getElementById("itemBadge").classList.toggle("show", day.rescueSuccess);
+    }
+
+    function renderWeek() {
+      weekTable.innerHTML = "";
+      getLastSevenKeys().forEach(function (key) {
+        const date = parseDateKey(key);
+        const day = state.days[key];
+        const card = document.createElement("div");
+        card.className = "day-card";
+
+        const title = document.createElement("div");
+        title.className = "day-name";
+        title.textContent = (date.getMonth() + 1) + "/" + date.getDate() + " " + dayNames[date.getDay()];
+
+        const dayScore = document.createElement("div");
+        dayScore.className = day ? "day-score" : "empty";
+        dayScore.textContent = day ? calculateScore(day) + "점" : "아직 기록 없음";
+
+        const restart = document.createElement("div");
+        restart.className = "restart";
+        restart.textContent = day && day.restartCount > 0 ? "다시 시작 " + day.restartCount + "번" : "흐름 유지 중";
+
+        card.appendChild(title);
+        card.appendChild(dayScore);
+        card.appendChild(restart);
+        weekTable.appendChild(card);
+      });
+    }
+
+    function addBadge(text) {
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = text;
+      badgeList.appendChild(badge);
+    }
+
+    function calculateScore(day) {
+      let points = 0;
+      points += Math.min(day.conditions.length * 8, 24);
+      points += Math.min(day.logs.meal * 10, 30);
+      points += Math.min(day.logs.water * 8, 24);
+      points += Math.min(day.logs.exercise * 12, 24);
+      if (day.missionCompleted) points += 22;
+      if (day.rescueSuccess) points += 18;
+      points += Math.min(day.restartCount * 6, 18);
+      return Math.min(points, 100);
+    }
+
+    function totalLogs(day) {
+      return day.logs.meal + day.logs.water + day.logs.exercise;
+    }
+
+    function getPraise(points, day) {
+      if (day.restartCount > 0) return "다시 시작한 횟수까지 기록한 게 진짜 실력이에요.";
+      if (day.rescueSuccess) return "충동을 넘긴 경험은 다음 밤에도 힘이 돼요.";
+      if (points >= 80) return "오늘은 방도 마음도 꽤 환해졌어요.";
+      if (points >= 45) return "완벽하진 않아도 방향은 분명히 좋아요.";
+      if (points > 0) return "작은 기록 하나면 오늘은 이미 시작됐어요.";
+      return "기록을 시작하면 방이 조금씩 살아나요.";
+    }
+
+    function getTodayMission() {
+      const index = Math.abs(hashText(todayKey)) % MISSIONS.length;
+      return MISSIONS[index];
+    }
+
+    function ensureToday() {
+      if (!state.days[todayKey]) {
+        state.days[todayKey] = copyDefaultDay();
+        saveState();
+      }
+    }
+
+    function getToday() {
+      return state.days[todayKey];
+    }
+
+    function saveAndRender() {
+      saveState();
+      render();
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        return { days: {} };
+      }
+      try {
+        const parsed = JSON.parse(saved);
+        if (!parsed.days) parsed.days = {};
+        return parsed;
+      } catch (error) {
+        return { days: {} };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function copyDefaultDay() {
+      return JSON.parse(JSON.stringify(defaultDay));
+    }
+
+    function getLastSevenKeys() {
+      const keys = [];
+      for (let i = 6; i >= 0; i -= 1) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        keys.push(getDateKey(date));
+      }
+      return keys;
+    }
+
+    function getDateKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return year + "-" + month + "-" + day;
+    }
+
+    function parseDateKey(key) {
+      const parts = key.split("-").map(Number);
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function formatKoreanDate(date) {
+      return date.getFullYear() + "년 " + (date.getMonth() + 1) + "월 " + date.getDate() + "일 " + dayNames[date.getDay()] + "요일";
+    }
+
+    function hashText(text) {
+      let hash = 0;
+      for (let i = 0; i < text.length; i += 1) {
+        hash = ((hash << 5) - hash) + text.charCodeAt(i);
+        hash |= 0;
+      }
+      return hash;
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(function () {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+  </script>
+</body>
+</html>
